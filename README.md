@@ -24,7 +24,7 @@ The response should contain an array of the following information extracted from
 "vehichles": [{
 "make" : String,
 "model": String,
-"liscenceNumber": String
+"modelYear": String
 }...],
 "drivers" : [{
 "driverName": String,

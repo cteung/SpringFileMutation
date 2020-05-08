@@ -1,7 +1,9 @@
 package com.quote.mutation.service;
 
-import com.quote.mutation.model.Driver;
-import com.quote.mutation.model.Vehicle;
+import com.quote.mutation.model.response.Driver;
+import com.quote.mutation.model.response.Vehicle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -9,12 +11,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class MutationServices {
+
+    Logger logger = LoggerFactory.getLogger(MutationServices.class);
 
     // XML Element tags
     public static String quoteRecordXpath = "//PersAutoPolicyQuoteInqRq";
@@ -89,5 +90,42 @@ public class MutationServices {
         Period diff1 = Period.between(l1, now1);
 
         return diff1.getYears();
+    }
+
+    //V2
+    public static String getTagValue(String object, String tag) {
+        if(object.contains(tag)) {
+            return object.split(tag)[1].substring(1).split("}|,")[0];
+        }
+        return "";
+    }
+
+    public static List<Driver> getDriversV2 (List<Object> PersAutoLineBusiness) {
+        List<Driver> Drivers = new ArrayList<>();
+        for (int i = 0; i < PersAutoLineBusiness.size(); i++) {
+            String object = PersAutoLineBusiness.get(i).toString();
+            if (object.contains(customerName) || object.contains(birthDay)) {
+                Driver d = new Driver();
+                d.driverName = getTagValue(object, customerName);
+                d.age = calculateAge(getTagValue(object, birthDay));
+                Drivers.add(d);
+            }
+        }
+        return Drivers;
+    }
+
+    public static List<Vehicle> getVehiclesV2 (List<Object> PersAutoLineBusiness) {
+        List<Vehicle> Vehicles = new ArrayList<>();
+        for (int i = 0; i < PersAutoLineBusiness.size(); i++) {
+            String object = PersAutoLineBusiness.get(i).toString();
+            if (object.contains(make) || object.contains(model) || object.contains(year)) {
+                Vehicle v = new Vehicle();
+                v.make = getTagValue(object, make);
+                v.model = getTagValue(object, model);
+                v.year = getTagValue(object, year);
+                Vehicles.add(v);
+            }
+        }
+        return Vehicles;
     }
 }

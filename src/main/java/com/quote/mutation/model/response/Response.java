@@ -1,16 +1,14 @@
-package com.quote.mutation.model;
-
-import com.quote.mutation.model.QuoteRecord;
+package com.quote.mutation.model.response;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ResponseV1 {
+public class Response {
 
     public int recordCount;
     public List<QuoteRecord> quotes;
 
-    public ResponseV1() {
+    public Response() {
         quotes = new ArrayList<>();
     }
 }

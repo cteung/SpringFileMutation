@@ -1,7 +1,4 @@
-package com.quote.mutation.model;
-
-import com.quote.mutation.model.Driver;
-import com.quote.mutation.model.Vehicle;
+package com.quote.mutation.model.response;
 
 import java.util.ArrayList;
 import java.util.List;

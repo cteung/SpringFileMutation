@@ -1,4 +1,4 @@
-package com.quote.mutation.model;
+package com.quote.mutation.model.response;
 
 public class Driver {
     public String driverName;

@@ -1,9 +1,11 @@
 package com.quote.mutation.controller;
 
-import com.quote.mutation.Employee;
-import com.quote.mutation.model.QuoteRecord;
-import com.quote.mutation.model.InsuranceSvcRq;
-import com.quote.mutation.model.ResponseV1;
+import com.quote.mutation.model.request.PersAutoPolicyQuoteInqRq;
+import com.quote.mutation.model.response.QuoteRecord;
+import com.quote.mutation.model.request.InsuranceSvcRq;
+import com.quote.mutation.model.response.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,14 +29,16 @@ import static com.quote.mutation.service.MutationServices.*;
 @RestController
 public class MutationController {
 
+    Logger logger = LoggerFactory.getLogger(MutationController.class);
+
     @PostMapping(
         value = "/v1/mutate",
         consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_XML_VALUE }, 
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseBody
-    public ResponseV1 mutateV1(@RequestBody String xml) throws Exception {
-        ResponseV1 res = new ResponseV1();
+    public Response mutateV1(@RequestBody String xml) throws Exception {
+        Response res = new Response();
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
@@ -64,4 +68,27 @@ public class MutationController {
         return res;
     }
 
+    @PostMapping(
+            value = "/v2/mutate",
+            consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_XML_VALUE },
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ResponseBody
+    public Response mutate(@RequestBody InsuranceSvcRq xml) {
+        Response res = new Response();
+        res.recordCount = xml.quotes.size();
+
+        for (int i = 0; i < xml.quotes.size(); i++) {
+            QuoteRecord record = new QuoteRecord();
+            PersAutoPolicyQuoteInqRq quote = xml.quotes.get(i);
+            record.policyNumber = quote.PersPolicy.PolicyNumber;
+            record.customerName = getTagValue(quote.InsuredOrPrincipal.GeneralPartyInfo.toString(), customerName);
+            record.policyType = quote.PersPolicy.LOBCd;
+            record.totalPremium = quote.PersPolicy.CurrentTermAmt.get(totalPremium);
+            record.vehicles = getVehiclesV2(quote.PersAutoLineBusiness);
+            record.drivers = getDriversV2(quote.PersAutoLineBusiness);
+            res.quotes.add(record);
+        }
+        return res;
+    }
 }

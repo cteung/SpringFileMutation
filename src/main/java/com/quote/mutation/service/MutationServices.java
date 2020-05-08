@@ -15,7 +15,7 @@ import java.util.*;
 
 public class MutationServices {
 
-    Logger logger = LoggerFactory.getLogger(MutationServices.class);
+    private static final Logger logger = LoggerFactory.getLogger(MutationServices.class);
 
     // XML Element tags
     public static String quoteRecordXpath = "//PersAutoPolicyQuoteInqRq";
@@ -62,6 +62,7 @@ public class MutationServices {
         return Drivers;
     }
 
+    // Utility Method
     public static String getElementText(Element item, String tag, int index) {
         NodeList e = item.getElementsByTagName(tag);
         if (e.getLength() > 0) {
@@ -77,6 +78,7 @@ public class MutationServices {
             d = sdf.parse(bd);
         } catch (ParseException e) {
             e.printStackTrace();
+            logger.error("Date format is incorrect, returning age as -1");
             return -1;
         }
 
@@ -92,7 +94,7 @@ public class MutationServices {
         return diff1.getYears();
     }
 
-    //V2
+    //V2 Methods
     public static String getTagValue(String object, String tag) {
         if(object.contains(tag)) {
             return object.split(tag)[1].substring(1).split("}|,")[0];

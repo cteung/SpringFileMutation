@@ -5,8 +5,24 @@ import java.util.List;
 
 public class Response {
 
-    public int recordCount;
-    public List<QuoteRecord> quotes;
+    private int recordCount;
+    private List<QuoteRecord> quotes;
+
+    public int getRecordCount() {
+        return recordCount;
+    }
+
+    public void setRecordCount(int recordCount) {
+        this.recordCount = recordCount;
+    }
+
+    public List<QuoteRecord> getQuotes() {
+        return quotes;
+    }
+
+    public void setQuotes(List<QuoteRecord> quotes) {
+        this.quotes = quotes;
+    }
 
     public Response() {
         quotes = new ArrayList<>();

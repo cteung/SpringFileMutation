@@ -38,9 +38,9 @@ public class MutationServices {
         int VehicleCount = item.getElementsByTagName(vehicle).getLength();
         for (int i = 0; i < VehicleCount; i++) {
             Vehicle v = new Vehicle();
-            v.make = getElementText(item, make, i);
-            v.model = getElementText(item, model, i);
-            v.year = getElementText(item, year, i);
+            v.setMake(getElementText(item, make, i));
+            v.setModel(getElementText(item, model, i));
+            v.setYear(getElementText(item, year, i));
             Vehicles.add(v);
         }
 
@@ -55,8 +55,8 @@ public class MutationServices {
         for (int i = 0; i < DriverCount; i++) {
             Driver d = new Driver();
             Element e = (Element) item.getElementsByTagName(driver).item(i);
-            d.driverName = getElementText(e, driverName, 0);
-            d.age = calculateAge(getElementText(e, birthDay, 0));
+            d.setDriverName(getElementText(e, driverName, 0));
+            d.setAge(calculateAge(getElementText(e, birthDay, 0)));
             Drivers.add(d);
         }
         return Drivers;
@@ -106,8 +106,8 @@ public class MutationServices {
             String object = PersAutoLineBusiness.get(i).toString();
             if (object.contains(customerName) || object.contains(birthDay)) {
                 Driver d = new Driver();
-                d.driverName = getTagValue(object, customerName);
-                d.age = calculateAge(getTagValue(object, birthDay));
+                d.setDriverName(getTagValue(object, customerName));
+                d.setAge(calculateAge(getTagValue(object, birthDay)));
                 Drivers.add(d);
             }
         }
@@ -120,9 +120,9 @@ public class MutationServices {
             String object = PersAutoLineBusiness.get(i).toString();
             if (object.contains(make) || object.contains(model) || object.contains(year)) {
                 Vehicle v = new Vehicle();
-                v.make = getTagValue(object, make);
-                v.model = getTagValue(object, model);
-                v.year = getTagValue(object, year);
+                v.setMake(getTagValue(object, make));
+                v.setModel(getTagValue(object, model));
+                v.setYear(getTagValue(object, year));
                 Vehicles.add(v);
             }
         }

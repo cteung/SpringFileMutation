@@ -7,7 +7,15 @@ import java.util.List;
 public class InsuranceSvcRq {
 
     @JsonProperty("InsuranceSvcRq")
-    public List<PersAutoPolicyQuoteInqRq> quotes;
+    private List<PersAutoPolicyQuoteInqRq> quotes;
+
+    public List<PersAutoPolicyQuoteInqRq> getQuotes() {
+        return quotes;
+    }
+
+    public void setQuotes(List<PersAutoPolicyQuoteInqRq> quotes) {
+        this.quotes = quotes;
+    }
 
     @Override
     public String toString()

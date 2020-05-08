@@ -31,3 +31,11 @@ The response should contain an array of the following information extracted from
 "age": Integer
 }...]
 ```
+
+## API
+
+POST `v1/mutate`
+DOM XPath implementation - This is limited by its input size, which is the max String length of 2^31-1. This implementation has the potential to consume a large amount of memory as the entire DOM will be loaded into memory.
+
+POST `v2/mutate`
+Jackson deserializer implementation - Although more complex, it is faster, can accept larger inputs, and is more memory efficient. 

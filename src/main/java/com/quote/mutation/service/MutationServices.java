@@ -1,9 +1,12 @@
 package com.quote.mutation.service;
 
+import com.quote.mutation.model.request.PersDriver;
+import com.quote.mutation.model.request.PersVeh;
 import com.quote.mutation.model.response.Driver;
 import com.quote.mutation.model.response.Vehicle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -13,24 +16,27 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
 
+@Component
 public class MutationServices {
 
     private static final Logger logger = LoggerFactory.getLogger(MutationServices.class);
 
     // XML Element tags
-    public static String quoteRecordXpath = "//PersAutoPolicyQuoteInqRq";
-    public static String policyNumber = "PolicyNumber";
-    public static String customerName = "CommercialName";
-    public static String policyType = "LOBCd";
-    public static String totalPremium = "Amt";
+    public static final String quoteRecordXpath = "//PersAutoPolicyQuoteInqRq";
+    public static final String policyNumber = "PolicyNumber";
+    public static final String nameInfo = "NameInfo";
+    public static final String customerName = "CommercialName";
+    public static final String policyType = "LOBCd";
+    public static final String totalPremium = "Amt";
 
-    private static String vehicle = "PersVeh";
-    private static String make = "Manufacturer";
-    private static String model = "Model";
-    private static String year = "ModelYear";
-    private static String driver = "PersDriver";
-    private static String driverName = "CommercialName";
-    private static String birthDay = "BirthDt";
+    private static final String vehicle = "PersVeh";
+    private static final String make = "Manufacturer";
+    private static final String model = "Model";
+    private static final String year = "ModelYear";
+    private static final String driver = "PersDriver";
+    private static final String driverName = "CommercialName";
+    public static final String personInfo = "PersonInfo";
+    public static final String birthDay = "BirthDt";
 
     public static List<Vehicle> getVehicles(Element item) {
         List<Vehicle> Vehicles = new ArrayList<>();
@@ -102,32 +108,34 @@ public class MutationServices {
         return "";
     }
 
-    public static List<Driver> getDriversV2 (List<Object> PersAutoLineBusiness) {
+    public static List<Driver> getDriversV2 (List<PersDriver> PersDriver) {
         List<Driver> Drivers = new ArrayList<>();
-        for (int i = 0; i < PersAutoLineBusiness.size(); i++) {
-            String object = PersAutoLineBusiness.get(i).toString();
-            if (object.contains(customerName) || object.contains(birthDay)) {
-                Driver d = new Driver();
-                d.setDriverName(getTagValue(object, customerName));
-                d.setAge(calculateAge(getTagValue(object, birthDay)));
-                Drivers.add(d);
-            }
+        for (int i = 0; i < PersDriver.size(); i++) {
+            Drivers.add(getDriverV2(PersDriver.get(i)));
         }
         return Drivers;
     }
 
-    public static List<Vehicle> getVehiclesV2 (List<Object> PersAutoLineBusiness) {
+    private static Driver getDriverV2(PersDriver pd) {
+        Driver d = new Driver();
+        d.setDriverName(pd.getCommercialName());
+        d.setAge(calculateAge(pd.getBirthDt()));
+        return d;
+    }
+
+    public static List<Vehicle> getVehiclesV2 (List<PersVeh> PersVeh) {
         List<Vehicle> Vehicles = new ArrayList<>();
-        for (int i = 0; i < PersAutoLineBusiness.size(); i++) {
-            String object = PersAutoLineBusiness.get(i).toString();
-            if (object.contains(make) || object.contains(model) || object.contains(year)) {
-                Vehicle v = new Vehicle();
-                v.setMake(getTagValue(object, make));
-                v.setModel(getTagValue(object, model));
-                v.setYear(getTagValue(object, year));
-                Vehicles.add(v);
-            }
+        for (int i = 0; i < PersVeh.size(); i++) {
+            Vehicles.add(getVehicleV2(PersVeh.get(i)));
         }
         return Vehicles;
+    }
+
+    private static Vehicle getVehicleV2(PersVeh pv) {
+        Vehicle v = new Vehicle();
+        v.setMake(pv.getManufacturer());
+        v.setModel(pv.getModel());
+        v.setYear(pv.getModelYear());
+        return v;
     }
 }

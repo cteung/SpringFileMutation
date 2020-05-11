@@ -1,8 +1,7 @@
 package com.quote.mutation.model.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.List;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 
 public class PersAutoPolicyQuoteInqRq {
 
@@ -13,7 +12,8 @@ public class PersAutoPolicyQuoteInqRq {
     private PersPolicy PersPolicy;
 
     @JsonProperty("PersAutoLineBusiness")
-    private List<Object> PersAutoLineBusiness;
+    @JacksonXmlElementWrapper(useWrapping = false)
+    private PersAutoLineBusiness PersAutoLineBusiness;
 
     public com.quote.mutation.model.request.InsuredOrPrincipal getInsuredOrPrincipal() {
         return InsuredOrPrincipal;
@@ -31,11 +31,11 @@ public class PersAutoPolicyQuoteInqRq {
         PersPolicy = persPolicy;
     }
 
-    public List<Object> getPersAutoLineBusiness() {
+    public PersAutoLineBusiness getPersAutoLineBusiness() {
         return PersAutoLineBusiness;
     }
 
-    public void setPersAutoLineBusiness(List<Object> persAutoLineBusiness) {
+    public void setPersAutoLineBusiness(PersAutoLineBusiness persAutoLineBusiness) {
         PersAutoLineBusiness = persAutoLineBusiness;
     }
 

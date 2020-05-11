@@ -4,6 +4,7 @@ import com.quote.mutation.model.request.PersAutoPolicyQuoteInqRq;
 import com.quote.mutation.model.response.QuoteRecord;
 import com.quote.mutation.model.request.InsuranceSvcRq;
 import com.quote.mutation.model.response.Response;
+import com.quote.mutation.service.MutationServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -24,12 +25,17 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 import java.io.StringReader;
 
-import static com.quote.mutation.service.MutationServices.*;
 
 @RestController
 public class MutationController {
 
     private static final Logger logger = LoggerFactory.getLogger(MutationController.class);
+
+    private final MutationServices ms;
+
+    public MutationController (MutationServices ms) {
+        this.ms = ms;
+    }
 
     @PostMapping(
         value = "/v1/mutate",
@@ -51,7 +57,7 @@ public class MutationController {
         XPathFactory xpathfactory = XPathFactory.newInstance();
         XPath xpath = xpathfactory.newXPath();
 
-        XPathExpression expr = xpath.compile(quoteRecordXpath);
+        XPathExpression expr = xpath.compile(ms.quoteRecordXpath);
         Object result = expr.evaluate(doc, XPathConstants.NODESET);
         NodeList nodes = (NodeList) result;
         res.setRecordCount(nodes.getLength());
@@ -59,12 +65,12 @@ public class MutationController {
         for (int i = 0; i < nodes.getLength(); i++) {
             QuoteRecord record = new QuoteRecord();
             Element item = (Element) nodes.item(i);
-            record.setPolicyNumber(getElementText(item, policyNumber, 0));
-            record.setCustomerName(getElementText(item, customerName, 0));
-            record.setPolicyType(getElementText(item, policyType, 0));
-            record.setTotalPremium(Float.parseFloat(getElementText(item, totalPremium,0)));
-            record.setVehicles(getVehicles(item));
-            record.setDrivers(getDrivers(item));
+            record.setPolicyNumber(ms.getElementText(item, ms.policyNumber, 0));
+            record.setCustomerName(ms.getElementText(item, ms.customerName, 0));
+            record.setPolicyType(ms.getElementText(item, ms.policyType, 0));
+            record.setTotalPremium(Float.parseFloat(ms.getElementText(item, ms.totalPremium,0)));
+            record.setVehicles(ms.getVehicles(item));
+            record.setDrivers(ms.getDrivers(item));
 
             res.getQuotes().add(record);
         }
@@ -89,11 +95,11 @@ public class MutationController {
             QuoteRecord record = new QuoteRecord();
             PersAutoPolicyQuoteInqRq quote = xml.getQuotes().get(i);
             record.setPolicyNumber(quote.getPersPolicy().getPolicyNumber());
-            record.setCustomerName(getTagValue(quote.getInsuredOrPrincipal().getGeneralPartyInfo().toString(), customerName));
+            record.setCustomerName(ms.getTagValue(quote.getInsuredOrPrincipal().getGeneralPartyInfo().toString(), ms.customerName));
             record.setPolicyType(quote.getPersPolicy().getLOBCd());
-            record.setTotalPremium(quote.getPersPolicy().getCurrentTermAmt().get(totalPremium));
-            record.setVehicles(getVehiclesV2(quote.getPersAutoLineBusiness()));
-            record.setDrivers(getDriversV2(quote.getPersAutoLineBusiness()));
+            record.setTotalPremium(quote.getPersPolicy().getCurrentTermAmt().get(ms.totalPremium));
+            record.setVehicles(ms.getVehiclesV2(quote.getPersAutoLineBusiness().getPersVeh()));
+            record.setDrivers(ms.getDriversV2(quote.getPersAutoLineBusiness().getPersDriver()));
             res.getQuotes().add(record);
         }
         return res;

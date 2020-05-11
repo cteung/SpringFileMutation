@@ -1,9 +1,7 @@
 package com.quote.mutation.controller;
 
-import com.quote.mutation.model.request.InsuranceSvcRq;
-import com.quote.mutation.model.request.InsuredOrPrincipal;
-import com.quote.mutation.model.request.PersAutoPolicyQuoteInqRq;
-import com.quote.mutation.model.request.PersPolicy;
+import com.quote.mutation.model.request.*;
+import com.quote.mutation.service.MutationServices;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -12,6 +10,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,16 +36,18 @@ public class MutationControllerTests {
 
     @Test
     void mutateV1Count() throws Exception {
-        Data data = new Data();
-        assertThat(controller.mutateV1(data.input).getRecordCount()).isEqualTo(3);
+        String testXml = new String(Files.readAllBytes(Paths.get("./data.xml")));
+        assertThat(controller.mutateV1(testXml).getRecordCount()).isEqualTo(3);
     }
 
     @Test
     void mutateV1PolicyNumber() throws Exception {
-        Data data = new Data();
-        assertThat(controller.mutateV1(data.input).getQuotes().get(0).getPolicyNumber()).isEqualTo("4843607801");
+        String testXml = new String(Files.readAllBytes(Paths.get("./data.xml")));
+        assertThat(controller.mutateV1(testXml).getQuotes().get(0).getPolicyNumber()).isEqualTo("4843607801");
     }
 
+    @Mock
+    PersAutoLineBusiness palb;
     @Mock
     PersAutoPolicyQuoteInqRq quote;
     @Mock
@@ -52,17 +55,33 @@ public class MutationControllerTests {
     @Mock
     InsuredOrPrincipal iop;
 
+    private String v2PolicyNumber = "246810";
+
+    public void v2Stubs() {
+        Mockito.when(quote.getPersPolicy()).thenReturn(persPolicy);
+        Mockito.when(persPolicy.getPolicyNumber()).thenReturn(v2PolicyNumber);
+        Mockito.when(quote.getInsuredOrPrincipal()).thenReturn(iop);
+        Mockito.when(iop.getGeneralPartyInfo()).thenReturn("info");
+        Mockito.when(quote.getPersAutoLineBusiness()).thenReturn(palb);
+    }
+
     @Test
     void mutateV2Count() throws Exception {
-        Data data = new Data();
+        v2Stubs();
         InsuranceSvcRq isr = new InsuranceSvcRq();
         List<PersAutoPolicyQuoteInqRq> list = new ArrayList<>();
         list.add(quote);
-        Mockito.when(quote.getPersPolicy()).thenReturn(persPolicy);
-        Mockito.when(persPolicy.getPolicyNumber()).thenReturn("100");
-        Mockito.when(quote.getInsuredOrPrincipal()).thenReturn(iop);
-        Mockito.when(iop.getGeneralPartyInfo()).thenReturn("abc");
         isr.setQuotes(list);
         assertThat(controller.mutateV2(isr).getRecordCount()).isEqualTo(1);
+    }
+
+    @Test
+    void mutateV2Policy() throws Exception {
+        v2Stubs();
+        InsuranceSvcRq isr = new InsuranceSvcRq();
+        List<PersAutoPolicyQuoteInqRq> list = new ArrayList<>();
+        list.add(quote);
+        isr.setQuotes(list);
+        assertThat(controller.mutateV2(isr).getQuotes().get(0).getPolicyNumber()).isEqualTo(v2PolicyNumber);
     }
 }
